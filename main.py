@@ -1,5 +1,3 @@
-import math
-
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import ticker
@@ -60,10 +58,11 @@ ax.xaxis.grid(True, linestyle='--', which='major', color='grey', alpha=.25)
 
 y_ticks = []
 y_labels = []
-for i, bar in enumerate(td.bars):
+bars = sorted(td.bars, key=lambda b: b.avg_tax_rate())
+for i, bar in enumerate(bars):
     colors = bar.colors(color_mapper)
-    labels = list(map(lambda x: f'{x} %', bar.tax_rates))
-    h_bars = ax.barh(i, bar.widths, 0.2, bar.starts, color=colors, edgecolor='white')
+    labels = list(map(lambda x: f'{x}%', bar.tax_rates))
+    h_bars = ax.barh(i, bar.widths, 0.5, bar.starts, color=colors, edgecolor='white')
     ax.bar_label(h_bars, labels=labels, label_type='center', color='black')
     y_ticks.append(i)
     y_labels.append(f'{bar.country_name} ({bar.currency})')

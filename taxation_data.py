@@ -40,6 +40,12 @@ class BarData:
     def colors(self, color_mapper):
         return list(map(color_mapper, self.tax_rates))
 
+    def max_tax_rate(self):
+        return max(self.tax_rates)
+
+    def avg_tax_rate(self):
+        return sum(self.tax_rates) / len(self.tax_rates)
+
 
 # USD -> Local currency FX rates
 exchange_rates = {
@@ -49,6 +55,8 @@ exchange_rates = {
     'INR': 83.1,
     'RUB': 89.88,
     'GBP': 0.78,
+    'BRL': 5.35,
+    'CAD': 1.38
 }
 
 # Tax brackets in local currency
@@ -74,7 +82,100 @@ taxation_data_local = [
                   TaxBracket(300000, 25),
                   TaxBracket(420000, 30),
                   TaxBracket(660000, 35),
-                  TaxBracket(960000, 45)])
+                  TaxBracket(960000, 45)]),
+    TaxationData('DE',
+                 'Germany',
+                 'EUR',
+                 'https://taxsummaries.pwc.com/germany/individual/taxes-on-personal-income',
+                 [TaxBracket(0, 0),
+                  TaxBracket(11604, 14, True),
+                  TaxBracket(66760, 42),
+                  TaxBracket(277825, 45)]),
+    TaxationData('JP',
+                 'Japan',
+                 'JPY',
+                 'https://taxsummaries.pwc.com/japan/individual/taxes-on-personal-income',
+                 [TaxBracket(0, 5),
+                  TaxBracket(1950000, 10),
+                  TaxBracket(3300000, 20),
+                  TaxBracket(6950000, 23),
+                  TaxBracket(9000000, 33),
+                  TaxBracket(18000000, 40),
+                  TaxBracket(40000000, 45)]),
+    TaxationData('IN',
+                 'India',
+                 'INR',
+                 'https://taxsummaries.pwc.com/india/individual/taxes-on-personal-income',
+                 [TaxBracket(0, 0),
+                  TaxBracket(300000, 5),
+                  TaxBracket(600000, 10),
+                  TaxBracket(900000, 15),
+                  TaxBracket(1200000, 20),
+                  TaxBracket(1500000, 30)]),
+    TaxationData('RU',
+                 'Russia',
+                 'RUB',
+                 'https://www.banki.ru/news/daytheme/?id=11003233',
+                 [TaxBracket(0, 13),
+                  TaxBracket(2400000, 15),
+                  TaxBracket(5000000, 18),
+                  TaxBracket(20000000, 20),
+                  TaxBracket(50000000, 22)]),
+    TaxationData('UK',
+                 'UK',
+                 'GBP',
+                 'https://taxsummaries.pwc.com/united-kingdom/individual/taxes-on-personal-income',
+                 [TaxBracket(0, 0),
+                  TaxBracket(12570, 20),
+                  TaxBracket(50270, 40),
+                  TaxBracket(125140, 45)]),
+    TaxationData('FR',
+                 'France',
+                 'EUR',
+                 'https://taxsummaries.pwc.com/france/individual/taxes-on-personal-income',
+                 [TaxBracket(0, 0),
+                  TaxBracket(11294, 11),
+                  TaxBracket(28797, 30),
+                  TaxBracket(82341, 41),
+                  TaxBracket(177106, 45)]),
+    TaxationData('BR',
+                 'Brazil',
+                 'BRL',
+                 'https://taxsummaries.pwc.com/brazil/individual/taxes-on-personal-income',
+                 [TaxBracket(0, 0),
+                  TaxBracket(1903.99 * 12, 7.5),
+                  TaxBracket(2826.66 * 12, 15),
+                  TaxBracket(3751.06 * 12, 22.5),
+                  TaxBracket(4664.68 * 12, 27.5)]),
+    TaxationData('IT',
+                 'Italy',
+                 'EUR',
+                 'https://taxsummaries.pwc.com/italy/individual/taxes-on-personal-income',
+                 [TaxBracket(0, 23),
+                  TaxBracket(28000, 35),
+                  TaxBracket(50000, 43)]),
+    TaxationData('CA',
+                 'Canada',
+                 'CAD',
+                 'https://taxsummaries.pwc.com/canada/individual/taxes-on-personal-income',
+                 [TaxBracket(0, 15),
+                  TaxBracket(53359, 20.5),
+                  TaxBracket(106717, 26),
+                  TaxBracket(165430, 29),
+                  TaxBracket(235675, 33)]),
+    TaxationData('PT',
+                 'Portugal',
+                 'EUR',
+                 'https://taxsummaries.pwc.com/portugal/individual/taxes-on-personal-income',
+                 [TaxBracket(0, 13.25),
+                  TaxBracket(7703, 18),
+                  TaxBracket(11623, 23),
+                  TaxBracket(16472, 26),
+                  TaxBracket(21321, 32.75),
+                  TaxBracket(27146, 37),
+                  TaxBracket(39791, 43.5),
+                  TaxBracket(51997, 45),
+                  TaxBracket(81199, 48)]),
 ]
 
 # Amount of skipped ticks on log scale e.g. 3 means skip 10, 100, 1000 and start from 10000
@@ -99,7 +200,8 @@ def __to_bars(taxation_data: TaxationData) -> BarData:
         starts.append(current.start)
         widths.append(following.start - current.start)
         tax_rates.append(current.tax_rate)
-    return BarData(taxation_data.country_name, taxation_data.currency, taxation_data.source_url, starts, widths, tax_rates)
+    return BarData(taxation_data.country_name, taxation_data.currency, taxation_data.source_url, starts, widths,
+                   tax_rates)
 
 
 # Tax brackets in USD
