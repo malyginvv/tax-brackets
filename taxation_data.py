@@ -14,13 +14,15 @@ class TaxBracket:
 
 @dataclass
 class TaxationData:
-    country: str
+    country_code: str
+    country_name: str
     currency: str
     source_url: str
     tax_brackets: list
 
     def convert(self, exchange_rate: float):
-        return TaxationData(self.country,
+        return TaxationData(self.country_code,
+                            self.country_name,
                             self.currency,
                             self.source_url,
                             list(map(lambda x: x.convert(exchange_rate), self.tax_brackets)))
@@ -28,7 +30,7 @@ class TaxationData:
 
 @dataclass
 class BarData:
-    country: str
+    country_name: str
     currency: str
     source_url: str
     starts: list
@@ -52,6 +54,7 @@ exchange_rates = {
 # Tax brackets in local currency
 taxation_data_local = [
     TaxationData('US',
+                 'USA',
                  'USD',
                  'https://www.irs.gov/filing/federal-income-tax-rates-and-brackets',
                  [TaxBracket(0, 10),
@@ -62,6 +65,7 @@ taxation_data_local = [
                   TaxBracket(231250, 35),
                   TaxBracket(578125, 37)]),
     TaxationData('CN',
+                 'China',
                  'CNY',
                  'https://taxsummaries.pwc.com/peoples-republic-of-china/individual/taxes-on-personal-income',
                  [TaxBracket(0, 3),
@@ -87,18 +91,15 @@ def __to_bars(taxation_data: TaxationData) -> BarData:
     # Add new marker tax bracket at the end
     brackets = taxation_data.tax_brackets + [TaxBracket(1000000, 0)]
 
-    # Convert USD to abstract units
-    units = list(map(lambda x: (__usd_to_bar_unit(x.start), x.tax_rate), brackets))
-
     # Calculate bar widths and start coordinates
     starts = []
     widths = []
     tax_rates = []
-    for current, following in zip(units, units[1:]):
-        starts.append(current[0])
-        widths.append(following[0] - current[0])
-        tax_rates.append(current[1])
-    return BarData(taxation_data.country, taxation_data.currency, taxation_data.source_url, starts, widths, tax_rates)
+    for current, following in zip(brackets, brackets[1:]):
+        starts.append(current.start)
+        widths.append(following.start - current.start)
+        tax_rates.append(current.tax_rate)
+    return BarData(taxation_data.country_name, taxation_data.currency, taxation_data.source_url, starts, widths, tax_rates)
 
 
 # Tax brackets in USD
