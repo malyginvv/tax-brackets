@@ -36,6 +36,7 @@ class BarData:
     starts: list
     widths: list
     tax_rates: list
+    tax_rates_labels: list
 
     def colors(self, color_mapper):
         return list(map(color_mapper, self.tax_rates))
@@ -196,12 +197,19 @@ def __to_bars(taxation_data: TaxationData) -> BarData:
     starts = []
     widths = []
     tax_rates = []
+    tax_rates_labels = []
     for current, following in zip(brackets, brackets[1:]):
         starts.append(current.start)
         widths.append(following.start - current.start)
-        tax_rates.append(current.tax_rate)
-    return BarData(taxation_data.country_name, taxation_data.currency, taxation_data.source_url, starts, widths,
-                   tax_rates)
+        tax_rates.append((following.tax_rate + current.tax_rate) // 2 if current.linear else current.tax_rate)
+        tax_rates_labels.append(f'{current.tax_rate}-{following.tax_rate}' if current.linear else f'{current.tax_rate}')
+    return BarData(taxation_data.country_name,
+                   taxation_data.currency,
+                   taxation_data.source_url,
+                   starts,
+                   widths,
+                   tax_rates,
+                   tax_rates_labels)
 
 
 # Tax brackets in USD
