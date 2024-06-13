@@ -33,36 +33,25 @@ def money_formatter(value: float, pos) -> str:
     return f'${amount:g}{unit}'
 
 
-# Amount of skipped ticks on log scale e.g. 3 means skip 1, 10, 100 and start from 1000
-__SKIP_LOGS = 3
-
-
-def forward_scale(a):
-    adjusted_a = np.where(a == 0, np.nan, a)
-    log_values = np.log10(adjusted_a) - __SKIP_LOGS
-    result = np.where(a > 0, log_values, 0)
-    return result
-
-
-def inverse_scale(a):
-    return np.power(10, a + __SKIP_LOGS)
-
-
 plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams['font.sans-serif'] = ['Tahoma', 'Lucida Grande', 'DejaVu Sans', 'Verdana']
 
+fig, ax = plt.subplots(figsize=(14, 10), layout="constrained")
+fig.suptitle('Income Tax Brackets: A Global Perspective', fontsize=20)
+ax.set_title('Focused on income tax rates; does not account for deductions, joint filings, or special regimes')
 
-fig, ax = plt.subplots(figsize=(12, 8))
-ax.set_title('Income Tax Brackets: A Global Perspective')
-ax.set_xscale('function', functions=(forward_scale, inverse_scale))
-ax.set_xlabel('Annual income, USD, logarithmic scale')
+
+ax.margins(0, 0)
+ax.set_xbound(0, 1000000)
+ax.set_xscale('log')
+ax.set_xlabel('Annual Income in USD (Logarithmic Scale)')
 ax.xaxis.set_major_formatter(money_formatter)
-ax.xaxis.set_major_locator(ticker.FixedLocator([0, 10000, 50000, 100000, 500000, 1000000]))
-ax.xaxis.grid(True, linestyle='--', which='major', color='grey', alpha=.25)
+ax.xaxis.set_major_locator(ticker.FixedLocator([0, 1000, 5000, 10000, 50000, 100000, 500000, 1000000]))
+ax.xaxis.grid(True, linestyle='--', which='major', color='grey', alpha=.5)
 
 y_ticks = []
 y_labels = []
-bars = sorted(td.bars, key=lambda b: b.avg_tax_rate())
+bars = sorted(td.bars, key=lambda b: b.gdp)
 for i, bar in enumerate(bars):
     colors = bar.colors(color_mapper)
     labels = list(map(lambda x: f'{x}', bar.tax_rates_labels))
