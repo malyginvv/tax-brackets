@@ -5,20 +5,16 @@ import taxation_data as td
 
 
 def color_mapper(tax_rate: float) -> str:
-    if tax_rate < 0.01:
-        return '#b7e2ff'
-    elif tax_rate < 10:
-        return '#9bc7e5'
-    elif tax_rate < 20:
-        return '#7fadcc'
+    if tax_rate == 0:
+        return '#F9F9F9'
+    elif tax_rate < 15:
+        return '#D1E5F0'
     elif tax_rate < 30:
-        return '#6493b3'
-    elif tax_rate < 40:
-        return '#487b9b'
-    elif tax_rate < 50:
-        return '#2b6384'
+        return '#8EC4DE'
+    elif tax_rate < 45:
+        return '#3A93C3'
     else:
-        return '#004c6d'
+        return '#1065AB'
 
 
 def money_formatter(value: float, _) -> str:
@@ -55,17 +51,17 @@ ax.set_xlabel('Annual Income in USD (Linear up to $10K, Logarithmic Beyond)', fo
 ax.xaxis.set_major_formatter(money_formatter)
 ax.xaxis.set_major_locator(ticker.FixedLocator([0, 1000, 5000, 10000, 50000, 100000, 500000, 1000000]))
 ax.xaxis.set_tick_params(labelsize=12)
-ax.xaxis.grid(True, linestyle='--', which='major', color='grey', alpha=.65)
+ax.xaxis.grid(True, linestyle='--', which='major', color='grey', alpha=.5)
 
 y_ticks = []
 y_labels = []
 country_bars = sorted(td.bar_data, key=lambda b: b.gdp, reverse=True)[:15]  # Top 15 countries by GDP
 counter = 0
 for bars in country_bars:
-    colors = bars.colors(color_mapper)
+    bar_colors = bars.colors(color_mapper)
     labels = list(map(lambda x: f'{x}%', bars.tax_rates_labels))
-    h_bars = ax.barh(counter, bars.widths, 0.7, bars.starts, color=colors, edgecolor='white')
-    ax.bar_label(h_bars, labels=labels, label_type='center', color='black')
+    h_bars = ax.barh(counter, bars.widths, 0.7, bars.starts, color=bar_colors, edgecolor='white')
+    ax.bar_label(h_bars, labels=labels, label_type='center', color='#000')
     y_ticks.append(counter)
     y_labels.append(f'{bars.country_name}')
     counter = counter + 1
