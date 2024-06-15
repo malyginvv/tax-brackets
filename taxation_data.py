@@ -242,16 +242,7 @@ taxation_data_local = [
                   TaxBracket(110000, 20),
                   TaxBracket(230000, 27),
                   TaxBracket(870000, 35),
-                  TaxBracket(3000000, 40)]),
-    # TaxationData(818427,
-    #              'Switzerland',
-    #              'CHF',
-    #              'https://taxsummaries.pwc.com/switzerland/individual/taxes-on-personal-income',
-    #              [TaxBracket(0, 15),
-    #               TaxBracket(110000, 20),
-    #               TaxBracket(230000, 27),
-    #               TaxBracket(870000, 35),
-    #               TaxBracket(3000000, 40)]),
+                  TaxBracket(3000000, 40)])
 ]
 
 
@@ -283,5 +274,4 @@ def __to_bars(taxation_data: TaxationData) -> BarData:
 taxation_data_usd = list(map(lambda td: td if td.currency == 'USD' else td.convert(exchange_rates[td.currency]),
                              taxation_data_local))
 
-# Bar data
-bars = list(map(__to_bars, taxation_data_usd))
+bar_data = list(map(__to_bars, taxation_data_usd))
