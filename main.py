@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 from matplotlib import ticker
 
 import taxation_data as td
@@ -22,7 +21,7 @@ def color_mapper(tax_rate: float) -> str:
         return '#004c6d'
 
 
-def money_formatter(value: float, pos) -> str:
+def money_formatter(value: float, _) -> str:
     if value == 0:
         return '$0'
     unit = 'K'
@@ -73,3 +72,4 @@ for bars in country_bars:
 
 ax.set_yticks(y_ticks, labels=y_labels, fontsize=12)
 plt.show()
+fig.savefig('tax_brackets.png')

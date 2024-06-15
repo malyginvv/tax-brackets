@@ -156,3 +156,5 @@ cython_debug/
 
 # PyCharm
 .idea/
+
+.png
