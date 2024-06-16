@@ -1,4 +1,3 @@
-import math
 from dataclasses import dataclass
 
 
@@ -29,24 +28,39 @@ class TaxationData:
 
 
 @dataclass
+class BarComponent:
+    start: float
+    width: float
+    tax_rate: float
+    tax_rate_label: str
+
+
+@dataclass
 class BarData:
     country_name: str
     currency: str
     source_url: str
-    starts: list
-    widths: list
-    tax_rates: list
-    tax_rates_labels: list
     gdp: int
+    components: list
 
-    def colors(self, color_mapper):
-        return list(map(color_mapper, self.tax_rates))
 
-    def max_tax_rate(self):
-        return max(self.tax_rates)
+def __to_bars(taxation_data: TaxationData) -> BarData:
+    # Add new marker tax bracket at the end
+    brackets = taxation_data.tax_brackets + [TaxBracket(1000000, 0)]
 
-    def avg_tax_rate(self):
-        return sum(self.tax_rates) / len(self.tax_rates)
+    # Calculate bar widths and start coordinates
+    components = []
+    for current, following in zip(brackets, brackets[1:]):
+        start = current.start
+        width = following.start - current.start
+        tax_rate = (following.tax_rate + current.tax_rate) // 2 if current.linear else current.tax_rate
+        tax_rate_label = f'{current.tax_rate}-{following.tax_rate}' if current.linear else f'{current.tax_rate}'
+        components.append(BarComponent(start, width, tax_rate, tax_rate_label))
+    return BarData(taxation_data.country_name,
+                   taxation_data.currency,
+                   taxation_data.source_url,
+                   taxation_data.gdp,
+                   components)
 
 
 # USD -> Local currency FX rates
@@ -244,30 +258,6 @@ taxation_data_local = [
                   TaxBracket(870000, 35),
                   TaxBracket(3000000, 40)])
 ]
-
-
-def __to_bars(taxation_data: TaxationData) -> BarData:
-    # Add new marker tax bracket at the end
-    brackets = taxation_data.tax_brackets + [TaxBracket(1000000, 0)]
-
-    # Calculate bar widths and start coordinates
-    starts = []
-    widths = []
-    tax_rates = []
-    tax_rates_labels = []
-    for current, following in zip(brackets, brackets[1:]):
-        starts.append(current.start)
-        widths.append(following.start - current.start)
-        tax_rates.append((following.tax_rate + current.tax_rate) // 2 if current.linear else current.tax_rate)
-        tax_rates_labels.append(f'{current.tax_rate}-{following.tax_rate}' if current.linear else f'{current.tax_rate}')
-    return BarData(taxation_data.country_name,
-                   taxation_data.currency,
-                   taxation_data.source_url,
-                   starts,
-                   widths,
-                   tax_rates,
-                   tax_rates_labels,
-                   taxation_data.gdp)
 
 
 # Tax brackets in USD
