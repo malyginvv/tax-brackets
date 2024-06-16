@@ -21,6 +21,4 @@ Just execute:
 python main.py
 ```
 
-This will open a window with graph in it and a file named `tax_brackets.png` will be saved it the current directory.
-
-# 
+This will open a window with a graph in it and a file named `tax_brackets.png` will be saved it the current directory.
